@@ -117,8 +117,7 @@ def run_gh_json(*, arguments: Sequence[str]) -> object:
     completed_process = try_gh(arguments=arguments)
     if completed_process.returncode != EXIT_CODE_SUCCESS:
         print(
-            f"Error: gh {' '.join(arguments)} failed:"
-            f" {completed_process.stderr.strip()}",
+            f"Error: gh {' '.join(arguments)} failed: {completed_process.stderr.strip()}",
             file=sys.stderr,
         )
         raise SystemExit(EXIT_CODE_PROTOCOL_FAILURE)

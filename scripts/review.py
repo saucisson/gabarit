@@ -32,7 +32,6 @@ subprocess, never an HTTP client (ADR-0001).
 import json
 import sys
 from dataclasses import dataclass
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from scripts import session
@@ -52,6 +51,7 @@ from scripts._shared import (
 if TYPE_CHECKING:
     import argparse
     from collections.abc import Sequence
+    from pathlib import Path
 
 REVIEW_DIRECTORY = REPOSITORY_ROOT / ".review"
 RULES_DOCUMENT_PATH = REPOSITORY_ROOT / "docs/rules.md"
@@ -237,14 +237,11 @@ def render_report_payload(*, commit_reviews: Sequence[CommitReview]) -> dict[str
                 "sha": commit_review.sha,
                 "subject": commit_review.subject,
                 "findings": [
-                    finding_payload(finding=finding)
-                    for finding in commit_review.findings
+                    finding_payload(finding=finding) for finding in commit_review.findings
                 ],
                 "blocking_count": commit_review.counts[session.FindingSeverity.BLOCKING],
                 "to_fix_count": commit_review.counts[session.FindingSeverity.TO_FIX],
-                "suggestion_count": commit_review.counts[
-                    session.FindingSeverity.SUGGESTION
-                ],
+                "suggestion_count": commit_review.counts[session.FindingSeverity.SUGGESTION],
             }
             for commit_review in commit_reviews
         ],
@@ -379,9 +376,7 @@ def run_review(*, arguments: argparse.Namespace) -> int:
         return EXIT_CODE_PRECONDITIONS_UNMET
     base_ref_container = pull_request.get("base")
     base_ref = (
-        base_ref_container.get("ref", "daily")
-        if isinstance(base_ref_container, dict)
-        else "daily"
+        base_ref_container.get("ref", "daily") if isinstance(base_ref_container, dict) else "daily"
     )
     commit_shas = list_commit_shas(base_ref=base_ref)
     if not commit_shas:

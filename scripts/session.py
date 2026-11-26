@@ -378,4 +378,3 @@ def evaluate_answer(
     """
     findings = parse_report(answer_text=narrow_json_answer(answer_text=answer_text))
     return findings, count_by_severity(findings=findings)
-

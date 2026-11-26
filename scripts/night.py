@@ -174,14 +174,9 @@ def fetch_issue(
     issue_number: int,
 ) -> dict[str, object] | None:
     """Fetch the issue, or report and return None if gh refuses it."""
-    completed_process = try_gh(
-        arguments=["api", f"repos/{repository_slug}/issues/{issue_number}"]
-    )
+    completed_process = try_gh(arguments=["api", f"repos/{repository_slug}/issues/{issue_number}"])
     if completed_process.returncode != EXIT_CODE_SUCCESS:
-        print(
-            f"Warning: could not fetch issue #{issue_number}:"
-            f" {completed_process.stderr.strip()}"
-        )
+        print(f"Warning: could not fetch issue #{issue_number}: {completed_process.stderr.strip()}")
         return None
     try:
         issue = json.loads(completed_process.stdout)
@@ -233,10 +228,7 @@ def fetch_candidate_issues(
         ]
     )
     if completed_process.returncode != EXIT_CODE_SUCCESS:
-        print(
-            f"Warning: could not list open issues:"
-            f" {completed_process.stderr.strip()}"
-        )
+        print(f"Warning: could not list open issues: {completed_process.stderr.strip()}")
         return []
     payload = json.loads(completed_process.stdout)
     if not isinstance(payload, list):
@@ -314,10 +306,7 @@ def fetch_candidate_pull_requests(
         ]
     )
     if completed_process.returncode != EXIT_CODE_SUCCESS:
-        print(
-            f"Warning: could not list open pull requests:"
-            f" {completed_process.stderr.strip()}"
-        )
+        print(f"Warning: could not list open pull requests: {completed_process.stderr.strip()}")
         return []
     payload = json.loads(completed_process.stdout)
     if not isinstance(payload, list):

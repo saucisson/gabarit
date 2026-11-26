@@ -272,10 +272,7 @@ def delete_branch(
         ]
     )
     if completed_process.returncode != EXIT_CODE_SUCCESS:
-        print(
-            f"Warning: could not delete branch {head_ref}:"
-            f" {completed_process.stderr.strip()}"
-        )
+        print(f"Warning: could not delete branch {head_ref}: {completed_process.stderr.strip()}")
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
