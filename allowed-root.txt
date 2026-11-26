@@ -1,0 +1,23 @@
+# Tracked top-level entries (ADR-0012). One bare name per line.
+# CI compares the tracked root against this list and fails on any
+# entry present below but absent here. Comments start with #.
+# A new top-level entry is an ADR-worthy decision (ADR-0001).
+.editorconfig
+.env.example
+.github
+.gitignore
+.pre-commit-config.yaml
+.python-version
+.vibe
+AGENTS.md
+LICENSE
+Makefile
+README.md
+allowed-root.txt
+docs
+gates.yaml
+pyproject.toml
+renovate.json5
+scripts
+tools
+uv.lock

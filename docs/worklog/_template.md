@@ -1,0 +1,10 @@
+# <title of the direct commit>
+
+- Date: YYYY-MM-DD
+- Type: revert | docs-only | hotfix
+- Scope: <files or systems touched>
+- Motive: <why, straight>
+- Evidence: <commands and actual output>
+- Known limits: <what remains unhandled>
+- Alternative: <when the choice was reversible and no ADR was
+  warranted: the option not taken, and why (ADR-0011)>

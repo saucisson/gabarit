@@ -1,0 +1,90 @@
+name: continuous-integration
+
+on:
+  push:
+    branches: [main, daily]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Root inventory (allowed-root.txt, ADR-0012)
+        run: |
+          git ls-files | cut -d/ -f1 | sort -u > "$RUNNER_TEMP/actual-root.txt"
+          grep -v '^#' allowed-root.txt | grep -v '^[[:space:]]*$' | sort -u \
+            > "$RUNNER_TEMP/allowed-root.txt"
+          unknown=$(comm -23 "$RUNNER_TEMP/actual-root.txt" "$RUNNER_TEMP/allowed-root.txt")
+          if [ -n "$unknown" ]; then
+            echo "Unknown top-level entries (add to allowed-root.txt or remove them):"
+            echo "$unknown"
+            exit 1
+          fi
+
+      - name: Node gate flavor syntax check (ADR-0012)
+        run: node --check tools/gates/react/n2_license.mjs
+
+      - name: Install uv and pin Python 3.15
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.15"
+          enable-cache: true
+
+      - name: Sync the locked environment
+        run: uv sync --locked
+
+      - name: english-only front
+        run: uv run python -m scripts english-only
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: mypy strict
+        run: uv run mypy tools/notify/src tools/notify/tests scripts
+
+      - name: import-linter onion contract
+        run: uv run lint-imports
+
+      - name: pytest with coverage floor
+        run: uv run pytest
+
+  security:
+    name: security gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          # Required by gitleaks-action to read pull request history.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: pip-audit of the locked graph
+        run: |
+          uv export --locked --no-emit-project --format requirements-txt \
+            --output-file requirements.txt
+          uvx pip-audit --requirement requirements.txt --strict
+
+
+      - name: Sync the locked environment
+        run: uv sync --locked
+
+      - name: License gate of the locked graph
+        run: uv run python -m scripts license-gate

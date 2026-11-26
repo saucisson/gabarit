@@ -1,0 +1,57 @@
+# Gate activation manifest (ADR-0012).
+# Gate catalog and shared data formats: docs/gates.md
+# Environments of this repository. An instance declares any subset;
+# this template exercises its own python gates.
+platform:
+  repository: saucisson/platform
+  # Registry commit this repository consumes. `pending` until the
+  # platform repository exists; consuming a shared domain while
+  # pending is frozen (ADR-0010). Pin sync: see platform-lock.txt.
+  pin: pending
+
+environments: [python]
+
+gates:
+  - id: english-only
+    flavor: agnostic
+    enabled: true
+  - id: ruff-lint
+    flavor: agnostic
+    enabled: true
+  - id: ruff-format
+    flavor: agnostic
+    enabled: true
+  - id: mypy-strict
+    flavor: python
+    enabled: true
+  - id: import-linter-onion
+    flavor: python
+    enabled: true
+  - id: pytest-coverage-floor
+    flavor: python
+    enabled: true
+  - id: gitleaks
+    flavor: agnostic
+    enabled: true
+  - id: pip-audit
+    flavor: python
+    enabled: true
+  - id: n2-license
+    flavor: python
+    enabled: true
+  - id: n2-license-node
+    flavor: react
+    enabled: false
+    reason: No react front in the template itself; the flavor ships
+      ready (tools/gates/react/n2_license.mjs) and activates on the
+      first react instance. Reviewer note: disabling requires an ADR
+      reference (ADR-0012).
+  - id: platform-pin-verify
+    flavor: python
+    enabled: false
+    reason: The platform registry does not exist yet; saucisson/platform
+      is the next repository to bootstrap (ADR-0010). Enabling this gate
+      is the first work item after it exists.
+  - id: root-inventory
+    flavor: agnostic
+    enabled: true
